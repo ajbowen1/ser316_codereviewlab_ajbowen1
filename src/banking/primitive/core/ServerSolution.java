@@ -12,10 +12,10 @@ class ServerSolution implements AccountServer {
 
 	static String fileName = "accounts.ser";
 
-	Map<String,Account> accountMap = null;
+	private Map<String,Account> _accountMap = null;
 
 	public ServerSolution() {
-		accountMap = new HashMap<String,Account>();
+		_accountMap = new HashMap<String,Account>();
 		File file = new File(fileName);
 		ObjectInputStream in = null;
 		try {
@@ -28,7 +28,7 @@ class ServerSolution implements AccountServer {
 				for (int i=0; i < size; i++) {
 					Account acc = (Account) in.readObject();
 					if (acc != null)
-						accountMap.put(acc.getName(), acc);
+						_accountMap.put(acc.getName(), acc);
 				}
 			}
 		} catch (Exception e) {
@@ -48,7 +48,7 @@ class ServerSolution implements AccountServer {
 	private boolean newAccountFactory(String type, String name, float balance)
 		throws IllegalArgumentException {
 		
-		if (accountMap.get(name) != null) return false;
+		if (_accountMap.get(name) != null) return false;
 		
 		Account acc;
 		if ("Checking".equals(type)) {
@@ -61,7 +61,7 @@ class ServerSolution implements AccountServer {
 			throw new IllegalArgumentException("Bad account type:" + type);
 		}
 		try {
-			accountMap.put(acc.getName(), acc);
+			_accountMap.put(acc.getName(), acc);
 		} catch (Exception exc) {
 			return false;
 		}
@@ -77,7 +77,7 @@ class ServerSolution implements AccountServer {
 	}
 	
 	public boolean closeAccount(String name) {
-		Account acc = accountMap.get(name);
+		Account acc = _accountMap.get(name);
 		if (acc == null) {
 			return false;
 		}
@@ -86,17 +86,17 @@ class ServerSolution implements AccountServer {
 	}
 
 	public Account getAccount(String name) {
-		return accountMap.get(name);
+		return _accountMap.get(name);
 	}
 
 	public List<Account> getAllAccounts() {
-		return new ArrayList<Account>(accountMap.values());
+		return new ArrayList<Account>(_accountMap.values());
 	}
 
 	public List<Account> getActiveAccounts() {
 		List<Account> result = new ArrayList<Account>();
 
-		for (Account acc : accountMap.values()) {
+		for (Account acc : _accountMap.values()) {
 			if (acc.getState() != State.CLOSED) {
 				result.add(acc);
 			}
@@ -109,9 +109,9 @@ class ServerSolution implements AccountServer {
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(fileName));
 
-			out.writeObject(Integer.valueOf(accountMap.size()));
-			for (int i=0; i < accountMap.size(); i++) {
-				out.writeObject(accountMap.get(i));
+			out.writeObject(Integer.valueOf(_accountMap.size()));
+			for (int i=0; i < _accountMap.size(); i++) {
+				out.writeObject(_accountMap.get(i));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
